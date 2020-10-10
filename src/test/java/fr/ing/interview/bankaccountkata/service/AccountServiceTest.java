@@ -1,6 +1,7 @@
 package fr.ing.interview.bankaccountkata.service;
 
 import fr.ing.interview.bankaccountkata.entity.Account;
+import fr.ing.interview.bankaccountkata.enumType.TypeTransaction;
 import fr.ing.interview.bankaccountkata.exception.AccountNotFound;
 import fr.ing.interview.bankaccountkata.exception.InvalidParameters;
 import fr.ing.interview.bankaccountkata.repository.AccountRepository;
@@ -18,6 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,6 +27,9 @@ class AccountServiceTest {
 
     @Mock
     private AccountRepository accountRepository;
+
+    @Mock
+    private TransactionService transactionService;
 
     @InjectMocks
     private AccountService accountService;
@@ -49,6 +54,8 @@ class AccountServiceTest {
         verify(accountRepository).save(argument.capture());
         assertThat(argument.getValue().getBalance()).isEqualTo("305.04");
 
+        verify(transactionService,times(1)).addTransaction(myAccount, TypeTransaction.DEPOSIT,new BigDecimal("0.01"));
+
     }
 
     @Test
@@ -71,6 +78,8 @@ class AccountServiceTest {
         ArgumentCaptor<Account> argument = ArgumentCaptor.forClass(Account.class);
         verify(accountRepository).save(argument.capture());
         assertThat(argument.getValue().getBalance()).isEqualTo("1.01");
+        verify(transactionService,times(1)).addTransaction(myAccount, TypeTransaction.WITHDRAW,new BigDecimal("304.02"));
+
 
     }
 

@@ -1,6 +1,7 @@
 package fr.ing.interview.bankaccountkata.service;
 
 import fr.ing.interview.bankaccountkata.entity.Account;
+import fr.ing.interview.bankaccountkata.enumType.TypeTransaction;
 import fr.ing.interview.bankaccountkata.exception.AccountNotFound;
 import fr.ing.interview.bankaccountkata.exception.InvalidParameters;
 import fr.ing.interview.bankaccountkata.repository.AccountRepository;
@@ -15,10 +16,12 @@ import java.util.UUID;
 public class AccountService {
 
     private AccountRepository accountRepository;
+    private TransactionService transactionService;
 
     @Autowired
-    public AccountService(AccountRepository accountRepository) {
+    public AccountService(AccountRepository accountRepository, TransactionService transactionService) {
         this.accountRepository = accountRepository;
+        this.transactionService = transactionService;
     }
 
     @Transactional
@@ -31,6 +34,7 @@ public class AccountService {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new AccountNotFound("Account UUID Not Found: " + accountId.toString()));
         account.setBalance(account.getBalance().add(amount));
 
+        this.transactionService.addTransaction(account, TypeTransaction.DEPOSIT,amount);
         accountRepository.save(account);
 
     }
@@ -48,6 +52,7 @@ public class AccountService {
         }
         account.setBalance(account.getBalance().add(amount.negate()));
 
+        this.transactionService.addTransaction(account, TypeTransaction.WITHDRAW,amount);
         accountRepository.save(account);
     }
 
