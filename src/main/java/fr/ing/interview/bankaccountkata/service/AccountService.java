@@ -1,0 +1,37 @@
+package fr.ing.interview.bankaccountkata.service;
+
+import fr.ing.interview.bankaccountkata.entity.Account;
+import fr.ing.interview.bankaccountkata.exception.AccountNotFound;
+import fr.ing.interview.bankaccountkata.exception.InvalidParameters;
+import fr.ing.interview.bankaccountkata.repository.AccountRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.UUID;
+
+@Service
+public class AccountService {
+
+    private AccountRepository accountRepository;
+
+    @Autowired
+    public AccountService(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
+    }
+
+    @Transactional
+    public void deposit(UUID accountId, BigDecimal amount) throws AccountNotFound, InvalidParameters {
+        if (accountId == null || amount == null) {
+            throw new InvalidParameters("AccountId or amount is null");
+        } else if (amount.compareTo(new BigDecimal("0.01"))  < 0) {
+            throw new InvalidParameters("Amount shall be greater than 0.01");
+        }
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new AccountNotFound("Account UUID Not Found: " + accountId.toString()));
+        account.setBalance(account.getBalance().add(amount));
+
+        accountRepository.save(account);
+
+    }
+}
