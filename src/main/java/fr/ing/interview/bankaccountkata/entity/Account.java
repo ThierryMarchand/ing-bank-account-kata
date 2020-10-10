@@ -1,6 +1,7 @@
 package fr.ing.interview.bankaccountkata.entity;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -23,6 +24,7 @@ public class Account {
     private String name;
 
     @Column(name="balance",precision=12, scale = 2)
+    @NonNull
     private BigDecimal balance;
 
 

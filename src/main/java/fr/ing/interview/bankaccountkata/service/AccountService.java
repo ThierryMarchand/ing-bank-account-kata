@@ -50,4 +50,14 @@ public class AccountService {
 
         accountRepository.save(account);
     }
+
+    public BigDecimal getBalance(UUID accountId) throws InvalidParameters, AccountNotFound {
+        if (accountId == null) {
+            throw new InvalidParameters("AccountId is null");
+        }
+
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new AccountNotFound("Account UUID Not Found: " + accountId.toString()));
+
+        return account.getBalance();
+    }
 }
