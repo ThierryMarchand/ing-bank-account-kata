@@ -34,4 +34,20 @@ public class AccountService {
         accountRepository.save(account);
 
     }
+
+    @Transactional
+    public void withdraw(UUID accountId, BigDecimal amount) throws AccountNotFound, InvalidParameters {
+        if (accountId == null || amount == null) {
+            throw new InvalidParameters("AccountId or amount is null");
+        }
+
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new AccountNotFound("Account UUID Not Found: " + accountId.toString()));
+
+        if (amount.compareTo(account.getBalance())  > 0) {
+            throw new InvalidParameters("Amount shall be lower than balance");
+        }
+        account.setBalance(account.getBalance().add(amount.negate()));
+
+        accountRepository.save(account);
+    }
 }

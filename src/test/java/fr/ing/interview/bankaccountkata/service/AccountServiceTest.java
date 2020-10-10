@@ -61,4 +61,22 @@ class AccountServiceTest {
     void depositThrowsInvalidParameters() {
         assertThrows(InvalidParameters.class, () -> accountService.deposit(myAccount.getId(), new BigDecimal("0.005")));
     }
+
+    @Test
+    void withdrawNormal() throws AccountNotFound, InvalidParameters {
+        Mockito.when(accountRepository.findById(myAccount.getId())).thenReturn(Optional.of(myAccount));
+        accountService.withdraw(myAccount.getId(), new BigDecimal("304.02"));
+
+
+        ArgumentCaptor<Account> argument = ArgumentCaptor.forClass(Account.class);
+        verify(accountRepository).save(argument.capture());
+        assertThat(argument.getValue().getBalance()).isEqualTo("1.01");
+
+    }
+
+    @Test
+    void withdrawTooMuch() throws InvalidParameters {
+        Mockito.when(accountRepository.findById(myAccount.getId())).thenReturn(Optional.of(myAccount));
+        assertThrows(InvalidParameters.class,() -> accountService.withdraw(myAccount.getId(), new BigDecimal("305.05")));
+    }
 }
