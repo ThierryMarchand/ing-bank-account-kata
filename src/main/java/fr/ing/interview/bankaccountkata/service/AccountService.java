@@ -43,6 +43,8 @@ public class AccountService {
     public void withdraw(UUID accountId, BigDecimal amount) throws AccountNotFound, InvalidParameters {
         if (accountId == null || amount == null) {
             throw new InvalidParameters("AccountId or amount is null");
+        } else if (amount.compareTo(new BigDecimal("0.01")) < 0) {
+            throw new InvalidParameters("Amount shall be greater than 0.01");
         }
 
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new AccountNotFound("Account UUID Not Found: " + accountId.toString()));
