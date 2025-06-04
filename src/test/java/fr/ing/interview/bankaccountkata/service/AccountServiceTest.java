@@ -90,6 +90,12 @@ class AccountServiceTest {
     }
 
     @Test
+    void withdrawNegativeAmount(){
+        Mockito.when(accountRepository.findById(myAccount.getId())).thenReturn(Optional.of(myAccount));
+        assertThrows(InvalidParameters.class,() -> accountService.withdraw(myAccount.getId(), new BigDecimal("-1")));
+    }
+
+    @Test
     void getBalance() throws InvalidParameters, AccountNotFound {
         Mockito.when(accountRepository.findById(myAccount.getId())).thenReturn(Optional.of(myAccount));
         assertThat(accountService.getBalance(myAccount.getId())).isEqualTo(new BigDecimal("305.03"));
